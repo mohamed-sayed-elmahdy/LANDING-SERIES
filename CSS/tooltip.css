@@ -1,0 +1,79 @@
+:root {
+  --tooltip-background: hsla(0, 0%, 95%, 0.9);
+  --tooltip-color: #444;
+
+}
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.0rem;
+    
+	
+}
+[data-tooltip]:before,
+[data-tooltip]:after {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out,
+              visibility 0.2s ease-in-out;
+  pointer-events: none;
+  bottom: 140%;
+  left:90%;
+}
+[data-tooltip]:before {
+  z-index: 1001;
+  border: 6px solid transparent;
+  background: transparent;
+  content: "";
+  margin-left: -6px;
+  margin-bottom: 0px;
+  border-top-color:#000;
+  display:none;
+  
+}
+[data-tooltip]:after {
+  content: attr(data-tooltip);
+    position: absolute;
+    z-index: 1001; /* Sopra ogni cosa */
+    
+    /* Posizionamento */
+    bottom: 160%; /* Posiziona sopra il pulsante */
+    left: 50%; /* Inizia a metà del pulsante */
+    transform: translateX(-50%) translateY(-10px); /* Centra orizzontalmente e sposta in alto */
+    
+    /* Stile */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 10px;
+    border-radius: 4px;
+     font-size: 16px;
+    white-space: nowrap;
+    
+    /* Animazione */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+
+}
+.tooltip-wrap:after {
+  white-space: normal;
+}
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after,
+[data-tooltip]:focus:before,
+[data-tooltip]:focus:after {
+  visibility: visible;
+  opacity: 1;
+ 
+}
+
+
+/* Esempio: Sposta il tooltip di sinistra leggermente a sinistra (p. es. di 10px) */
+[data-tooltip].video-toggle-label:after {
+    /* Mantiene la centratura orizzontale */
+    transform: translateX(-50%); 
+    
+    /* Sposta il punto di partenza del tooltip da 90% a 80% */
+    left: 80%; 
+}
