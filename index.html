@@ -1,526 +1,1024 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sito con Video Background</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sito con Video Background</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
 
-<style>
-  /* Stili generali */
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    font-family: Arial, sans-serif;
-    background: #121212;
-    color: #fff;
-    overflow-x: hidden;
-  }
-  .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative; 
-  }
-  /* Navbar pulita senza tasto Film */
-  nav {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    z-index: 100; 
-  }
+  <style>
+    /* Stili generali */
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Navbar pulita senza tasto Film */
+    nav {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      z-index: 100;
+    }
+
     .filter-wrapper {
-            width: 520px;
-            display: flex;
-            flex-direction: column;
+      width: 520px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* BARRA DI RICERCA */
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 45px;
+      margin-bottom: 20px;
+    }
+
+    .search-btn {
+      width: 45px;
+      height: 45px;
+      background: var(--bg-card);
+
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      color: var(--accent-cyan);
+      z-index: 12;
+    }
+
+    .search-input {
+      width: 0;
+      height: 45px;
+      background: var(--bg-card);
+      border: 1px solid transparent;
+      border-radius: 22px;
+      padding: 0;
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.5s ease;
+      position: absolute;
+      left: 0;
+      opacity: 0;
+      padding-left: 50px;
+      box-sizing: border-box;
+    }
+
+    .search-wrapper.active .search-input {
+      width: 400px;
+      opacity: 1;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 148px;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 13;
+    }
+
+    .search-wrapper.active .close-btn {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* CONTENITORE CATEGORIA CON HOVER */
+    .category-container {
+      width: 480px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .category-main {
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .category-title {
+      font-weight: bold;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .arrow-icon {
+      color: var(--accent-cyan);
+      font-size: 12px;
+    }
+
+    /* DROPDOWN CHE APPARE IN HOVER */
+    .hover-details {
+      max-height: 0;
+      overflow: hidden;
+      background: #111;
+      border: 2px solid #333;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      margin-top: -10px;
+      /* Sovrapposizione per continuità visiva */
+      padding: 0 18px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      color: #fff;
+
+    }
+
+    .category-container:hover .category-main {
+      border-color: #333;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .category-container:hover .hover-details {
+      max-height: 150px;
+      padding: 15px 18px;
+      opacity: 1;
+      margin-top: 0;
+    }
+
+    /* GRIGLIA SOTTOCATEGORIE */
+    .sub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 480px;
+      margin-top: 10px;
+    }
+
+    .sub-box {
+      background: #1a1a1a;
+      border: 1px solid var(--border-dim);
+      border-radius: 8px;
+      padding: 8px;
+      color: #ccc;
+      font-size: 11px;
+      text-align: center;
+      min-height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .sub-box:hover {
+      border-color: var(--accent-cyan);
+      color: white;
+      background: #222;
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-arrow {
+      cursor: pointer;
+      color: #fff;
+      font-size: 18px;
+      user-select: none;
+    }
+
+
+    main {
+      flex: 1;
+      overflow: hidden;
+      background: #222;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Player sempre attivo */
+    .video-player-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: hidden;
+    }
+
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: initial;
+      z-index: 1;
+    }
+
+    .thumbnail {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: initial;
+      z-index: 1;
+      display: block;
+      cursor: pointer;
+    }
+
+    #overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 30;
+      color: white;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .overlay-content-aligned {
+      position: absolute;
+      bottom: 20%;
+      left: 6%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: auto;
+    }
+
+    #title-image {
+      width: 100%;
+      max-width: 300px;
+      transition: transform 0.8s ease-in-out;
+      margin-top: 15px;
+    }
+
+    #description {
+      margin-top: 50px;
+      margin-left: -60px;
+      font-size: 24px;
+      line-height: 1.3;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 1s ease, transform 1s ease;
+      max-width: 480px;
+    }
+
+    #description.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .video-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 60px;
+      z-index: 40;
+    }
+
+    .video-controls button {
+      background: rgba(0, 0, 0, 0.2);
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .playbutton {
+      margin-top: 20px;
+      margin-left: 35px;
+      background: #333;
+      border: none;
+      padding: 12px 24px;
+      color: white;
+      font-size: 18px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      width: 250px;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .sistemclass {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      position: fixed;
+      z-index: 1000;
+      color: #fff;
+      margin-left: 80px;
+      margin-top: 683px;
+      padding: 10px;
+      font-size: 22px;
+    }
+
+    .progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 6px;
+      width: 0%;
+      background: red;
+      z-index: 1000;
+    }
+
+    .sfumate-overlay {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+      background: linear-gradient(to left, #000 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .sfumate-overlay.show {
+      opacity: 1;
+    }
+
+    /* Toggle Switch */
+    .video-toggle-container {
+      position: absolute;
+      top: 850px;
+      left: 60px;
+      z-index: 100;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+      width: 50px;
+      height: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 15px;
+      width: 15px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #800000;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+  </style>
+  <!-- Playlist -->
+  <style>
+    .playlist {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 20px 100px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist {
+        padding: 20px;
+      }
+    }
+
+    .playlist--open-modal {
+      pointer-events: none;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist--open-modal {
+        height: 0;
+        overflow: hidden;
+      }
+    }
+
+
+    .playlist__wrapper {
+      width: 100%;
+      min-width: 735px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__wrapper {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+
+    .playlist__header {
+      padding: 15px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__header {
+        flex-direction: column;
+      }
+    }
+
+    .playlist__title {
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__title {
+        margin-bottom: 10px;
+      }
+    }
+
+
+
+    .playlist__dropdown {
+      position: relative;
+      display: flex;
+      width: 220px;
+      margin-left: -1300px;
+      margin-right: 100px;
+      margin-top: 600px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__dropdown {
+        width: 100%;
+      }
+    }
+
+    .playlist__item {
+      display: none;
+      background: #444;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__item {
+        border-bottom: none;
+      }
+    }
+
+    .playlist__item--active {
+      display: flex;
+      flex-wrap: wrap;
+      border-radius: 10px;
+    }
+
+    .playlist__series {
+      display: grid;
+      grid-template-areas: 'number preview title duration' 'number preview description description';
+      grid-template-columns: 65px 250px 2fr 1fr;
+      align-items: center;
+      grid-template-rows: 30px 1fr;
+      grid-column-gap: 15px;
+      padding: 20px 5px;
+      width: 50%;
+
+
+    }
+
+    .playlist__series:nth-child(odd) {
+      border-right: 20px solid #080808;
+
+
+    }
+
+    .playlist__series--lastWatched {
+      background: #222;
+      position: relative;
+
+    }
+
+    .playlist__series--lastWatched .playlist__series-number {
+      display: none;
+    }
+
+    .playlist__series--lastWatched:after {
+      content: '';
+      width: 30px;
+      height: 30px;
+      background: var(--main-element-color);
+      mask: var(--play-icon);
+      -webkit-mask: var(--play-icon);
+      mask-size: contain;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      position: absolute;
+      left: 30px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__series {
+        grid-template-areas: 'number number' 'preview preview' 'title duration' 'description description';
+        grid-template-columns: 3fr 1fr;
+        grid-template-rows: auto;
+        grid-gap: 5px;
+        border-top: none;
+        margin-bottom: 35px;
+        width: 100%;
+      }
+    }
+
+    .playlist__series-number {
+      grid-area: number;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 500;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__series-number {
+        margin-bottom: 4px;
+      }
+
+      .playlist__series-number:after {
+        content: '';
+        flex-grow: 1;
+        height: 1px;
+        background: var(--main-element-color);
+        margin-left: 10px;
+      }
+    }
+
+    .playlist__series-preview {
+      grid-area: preview;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: auto;
+    }
+
+    .playlist__series-preview-item {
+      width: 100%;
+      padding-bottom: 60%;
+      position: relative;
+    }
+
+    .playlist__series-preview-item-video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 1;
+    }
+
+    .playlist__series-preview-item-img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 2;
+    }
+
+    .thumbnail__time {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background-color: rgba(0, 0, 0, .5);
+      z-index: 999;
+      font-size: 11px;
+      padding: 2px;
+      border-radius: 2px;
+      z-index: 99;
+    }
+
+    .playlist__series-title {
+      grid-area: title;
+      font-size: 16px;
+    }
+
+    .playlist__series-duration {
+      grid-area: duration;
+      text-align: right;
+      font-size: 16px;
+    }
+
+    @media (max-width: 1023px) {
+      .playlist__series-title {
+        margin-top: 20px;
+      }
+
+      .playlist__series-duration {
+        margin-top: 20px;
+      }
+    }
+
+    .playlist__series-description {
+      grid-area: description;
+      font-size: 14px;
+    }
+
+    .border-gradient {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 23px;
+      user-select: none;
+      white-space: nowrap;
+      text-align: center;
+      padding: 0.65rem 1.5rem;
+      border-radius: 5px;
+      text-transform: capitalize;
+      color: #fff;
+      border: 1px solid #ccc;
+      transition: all 0.3s ease-in-out;
+      width: 250px;
+      background: transparent;
+
+    }
+
+    .border-gradient #PlayButtonIcon {
+      margin-right: 6px;
+    }
+
+    /* .border-gradient:hover {
+        color:/*#00ddff*#9dd7e0;
+        
         }
 
-        /* BARRA DI RICERCA */
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            height: 45px;
-            margin-bottom: 20px;
+        .border-gradient-purple {
+        border-image-source: linear-gradient(to left, #0066ff, #00ffff);
+        
         }
 
-        .search-btn {
-            width: 45px;
-            height: 45px;
-            background: var(--bg-card);
-           
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            color: var(--accent-cyan);
-            z-index: 12;
-        }
+        .border-gradient-purple:hover {
+            border-image-source: linear-gradient(to right, #0066ff, #00ffff);
+        } */
+    @media (max-width: 1023px) {
+      .border-gradient {
+        margin-top: 20px;
+      }
+    }
 
-        .search-input {
-            width: 0;
-            height: 45px;
-            background: var(--bg-card);
-            border: 1px solid transparent;
-            border-radius: 22px;
-            padding: 0;
-            color: white;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.5s ease;
-            position: absolute;
-            left: 0;
-            opacity: 0;
-            padding-left: 50px;
-            box-sizing: border-box;
-        }
+    .top-progress-bar {
+      width: 100%;
+      position: absolute;
+      bottom: -11px;
+      height: 5px;
+      border-radius: 0;
+    }
 
-        .search-wrapper.active .search-input { width: 400px; opacity: 1; }
+    #bottom-progress-bar {
+      border-radius: 0;
+      height: 5px;
+      display: none;
+    }
 
-        .close-btn {
-            position: absolute;
-            right: 148px;
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            z-index: 13;
-        }
+    progress::-webkit-progress-bar {
+      /* style rules */
+      background-color: #9e9e9e;
+    }
 
-        .search-wrapper.active .close-btn { opacity: 1; visibility: visible; }
+    progress::-webkit-progress-value {
+      /* style rules */
+      background-color: #2463eb;
+    }
 
-        /* CONTENITORE CATEGORIA CON HOVER */
-        .category-container {
-            width: 480px;
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        .category-main {
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 12px 18px;
-            background: #1a1a1a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-            cursor: default;
-        }
-
-        .category-title { font-weight: bold; font-size: 16px; text-transform: uppercase; }
-        .arrow-icon { color: var(--accent-cyan); font-size: 12px; }
-
-        /* DROPDOWN CHE APPARE IN HOVER */
-        .hover-details {
-            max-height: 0;
-            overflow: hidden;
-            background: #111;
-            border: 2px solid #333;
-            border-top: none;
-            border-radius: 0 0 12px 12px;
-            margin-top: -10px; /* Sovrapposizione per continuità visiva */
-            padding: 0 18px;
-            opacity: 0;
-            transition: all 0.3s ease;
-            font-size: 13px;
-            color:#fff;
-            
-        }
-
-        .category-container:hover .category-main {
-            border-color:#333;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        .category-container:hover .hover-details {
-            max-height: 150px;
-            padding: 15px 18px;
-            opacity: 1;
-            margin-top: 0;
-        }
-
-        /* GRIGLIA SOTTOCATEGORIE */
-        .sub-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            width: 480px;
-            margin-top: 10px;
-        }
-
-        .sub-box {
-            background: #1a1a1a;
-            border: 1px solid var(--border-dim);
-            border-radius: 8px;
-            padding: 8px;
-            color: #ccc;
-            font-size: 11px;
-            text-align: center;
-            min-height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-
-        .sub-box:hover { border-color: var(--accent-cyan); color: white; background: #222; }
-
-        .nav-controls { display: flex; gap: 15px; }
-        .nav-arrow { cursor: pointer; color:#fff; font-size: 18px; user-select: none; }
-		
-		
-  main {
-    flex: 1; 
-    overflow: hidden; 
-    background: #222; 
-    position: absolute; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; 
-    z-index: 1; 
-  }
-  
-  /* Player sempre attivo */
-  .video-player-container {
-    position: absolute; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block; 
-    overflow: hidden; 
-  }
-  video {
-    position: absolute;
-    top: 0; left: 0; 
-    width: 100%;
-    height: 100%;
-    object-fit: initial;
-    z-index: 1;
-  }
-  .thumbnail {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: initial;
-    z-index: 1;
-    display: block;
-    cursor: pointer;
-  }
-  
-  #overlay {
-    position: absolute;
-    bottom: 0; 
-    left: 0; 
-    width: 100%;
-    height: 100%;
-    z-index: 30;
-    color: white;
-    user-select: none;
-    pointer-events: none; 
-  }
-  
-  .overlay-content-aligned {
-    position: absolute;
-    bottom: 20%; 
-    left: 6%; 
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; 
-    pointer-events: auto; 
-  }
-  
-  #title-image {
-    width: 100%; 
-    max-width: 300px; 
-    transition: transform 0.8s ease-in-out;
-    margin-top: 15px; 
-  }
-  
-  #description {
-    margin-top: 50px; 
-    margin-left: -60px;
-    font-size: 24px;
-    line-height: 1.3;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 1s ease, transform 1s ease;
-    max-width: 480px;
-  }
-  #description.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .video-controls {
-    position: absolute;
-    bottom: 10px;
-    right: 60px; 
-    z-index: 40;
-  }
-  .video-controls button {
-    background: rgba(0,0,0,0.2);
-    border: none;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .playbutton {
-    margin-top: 20px;
-    margin-left: 35px;
-    background: #333;
-    border: none;
-    padding: 12px 24px;
-    color: white;
-    font-size: 18px;
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    opacity: 0;
-    animation: fadeIn 1s ease forwards;
-    width: 250px;
-  }
-  @keyframes fadeIn { to { opacity: 1; } }
-
-  .sistemclass {
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    position: fixed;
-    z-index: 1000;
-    color: #fff;
-    margin-left: 80px;
-    margin-top: 683px;
-    padding: 10px;
-    font-size: 22px;
-  }
-
-  .progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 6px; 
-    width: 0%;
-    background: red; 
-    z-index: 1000;
-  }
-
-  .sfumate-overlay {
-    position: absolute;
-    top: 0; width: 100%; height: 100%;
-    z-index: 2;
-    opacity: 0;
-    transition: opacity 1s ease;
-    pointer-events: none;
-    background: linear-gradient(to left, #000 0%, rgba(0,0,0,0) 100%);
-  }
-  .sfumate-overlay.show { opacity: 1; }
-
-  /* Toggle Switch */
-  .video-toggle-container {
-    position: absolute;
-    top: 850px;
-    left: 60px;
-    z-index: 100;
-  }
-  .slider {
-    position: absolute; cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #333;
-    transition: .4s; border-radius: 34px;
-    width: 50px; height: 20px;
-  }
-  .slider:before {
-    position: absolute; content: "";
-    height: 15px; width: 15px; left: 4px; bottom: 3px;
-    background-color: white; transition: .4s; border-radius: 50%;
-  }
-  input:checked + .slider { background-color: #800000; }
-  input:checked + .slider:before { transform: translateX(26px); }
-</style>
+    progress::-moz-progress-bar {
+      /* style rules */
+      background-color: #9e9e9e;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="container">
-  <nav>
-    <div class="filter-wrapper">
-    <div class="search-wrapper" id="searchWrapper">
-        <div class="search-btn" onclick="document.getElementById('searchWrapper').classList.add('active'); document.getElementById('searchInput').focus();">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"  stroke="#fff" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+  <div class="container">
+    <nav>
+      <div class="filter-wrapper">
+        <div class="search-wrapper" id="searchWrapper">
+          <div class="search-btn"
+            onclick="document.getElementById('searchWrapper').classList.add('active'); document.getElementById('searchInput').focus();">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input type="text" id="searchInput" class="search-input" placeholder="Cerca..." autocomplete="off">
+          <img src="assets/close.png" id="closeSearch" class="close-btn" onclick="location.reload()">
         </div>
-        <input type="text" id="searchInput" class="search-input" placeholder="Cerca..." autocomplete="off">
-        <img src="close.png" id="closeSearch" class="close-btn" onclick="location.reload()">
-    </div>
-    <div id="results-container"></div>
-</div>
-  </nav>
+        <div id="results-container"></div>
+      </div>
+    </nav>
 
-  <main>
-    <div id="videoContent" class="video-player-container">
+    <main>
+      <div id="videoContent" class="video-player-container">
         <video id="main-video" muted="true" playsinline preload="auto"></video>
         <img class="thumbnail" alt="thumbnail" />
         <div class="progress-bar" id="progressBar"></div>
-        
+
         <div id="overlay">
-            <div class="overlay-content-wrapper overlay-content-aligned"> 
-              <img id="title-image" src="" alt="title image" />
-              <p id="description"></p>
-              <button onclick="playVideo()" id="PlayButton" class="playbutton">
-                <i class="fas fa-play"></i> <span>Play Video</span>
-              </button>
-            </div>
-        </div>
-        
-        <div class="sistemclass">+13</div>
-        
-        <div class="video-controls">
-            <button id="muteBtn"> 
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
-                <path d="M3 9v6h4l5 5V4L7 9H3z"/>
-              </svg>
+          <div class="overlay-content-wrapper overlay-content-aligned">
+            <img id="title-image" src="" alt="title image" />
+            <p id="description"></p>
+            <button onclick="playVideo()" id="PlayButton" class="playbutton">
+              <i class="fas fa-play"></i> <span>Play Video</span>
             </button>
+          </div>
+        </div>
+
+        <div class="sistemclass">+13</div>
+
+        <div class="video-controls">
+          <button id="muteBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <path d="M3 9v6h4l5 5V4L7 9H3z" />
+            </svg>
+          </button>
         </div>
         <div id="sfumate-overlay" class="sfumate-overlay"></div>
-    </div>
+      </div>
 
-    <div class="video-toggle-container">
+      <div class="video-toggle-container">
         <label style="position:relative; display:inline-block; width:50px; height:20px;">
-            <input type="checkbox" id="videoToggle" checked onchange="toggleVideoVisibility()" style="opacity:0; width:0; height:0;">
-            <span class="slider"></span>
+          <input type="checkbox" id="videoToggle" checked onchange="toggleVideoVisibility()"
+            style="opacity:0; width:0; height:0;">
+          <span class="slider"></span>
         </label>
-    </div>
-  </main>
-</div>
+      </div>
+    </main>
+        <div class="playlist" id="home">
+            <div class="playlist__wrapper">
+                <div class="playlist__header">
+                    <div class="playlist__title">
+                        <div class="playlist__title-text">Watch Season</div>
+                        <div class="playlist__title-number">1</div>
+                    </div>
 
-<script>
-  const video = document.getElementById("main-video");
-  const thumbnail = document.querySelector(".thumbnail");
-  const progressBar = document.getElementById("progressBar");
-  const muteBtn = document.getElementById("muteBtn");
-  const titleImage = document.getElementById("title-image");
-  const description = document.getElementById("description");
-  const sfumateOverlay = document.getElementById("sfumate-overlay");
-  const videoToggle = document.getElementById('videoToggle');
+                    <div class="playlist__dropdown" id="seasondropdown">
+                        <select class="select" data-season-select></select>
+                    </div>
+                    <button id="PlayButton" class="playbutton" style="width: 17rem;" data-toggle="modal"
+                        data-target="#homeVideo" data-backdrop="static" data-keyboard="false">
+                        <span></span><span><i id="PlayButtonIcon" class="fas fa-play"></i> <span class="traxer">Play
+                                Video</span> </span>
+                    </button>
 
-  const videos = [
-    {
-      poster: "assets/antman.jpg",
-      mp4: "assets/antman.mp4",
-      titleImg: "assets/antman.png",
-      description: "Un ex ingegnere elettronico e ladro che entra in possesso di una tecnologia che gli permette di ridere delle sue dimensioni."
+                </div>
+                <div>
+                    <div class="item" style="text-align:right;">
+                        <canvas class="f233" id="canvasId"></canvas>
+                    </div>
+                    <progress id="bottom-progress-bar" min="0" max="100" value="33">33% played</progress>
+                </div>
+
+                <div class="box" id="ply">
+                    <h5>Playlist</h5>
+                </div>
+                <div class="playlist__items"></div>
+
+            </div>
+
+
+
+            <div class="modal-player modal-player--open-playlist">
+
+                <div class="modal-player__back"></div>
+                <div class="modal-player__close"></div>
+
+                <div class="modal-player__items"></div>
+
+                <div class="modal-player__playlist">
+                    <div class="modal-player__playlist-content custom-scroll"></div>
+
+                    <div class="modal-player__playlist-footer">
+
+                        <div class="modal-player__playlist-footer-next">
+                            <div class="modal-player__playlist-footer-next-button"></div>
+                            <div class="modal-player__playlist-footer-next-text">Season 1 Series 2</div>
+                        </div>
+
+                        <!-- <div class="modal-player__playlist-footer-select">
+                <select class="select" data-season-select><option value="0">Season 1</option><option value="1">Season 2</option><option value="2">Season 3</option><option value="3">Season 4</option></select>            
+            </div> -->
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="playlist__items"></div>
+
+        </div>
+
+ 
+
+        <div class="modal-player modal-player--open-playlist">
+
+            <div class="modal-player__back"></div>
+            <div class="modal-player__close"></div>
+
+            <div class="modal-player__items"></div>
+
+            <div class="modal-player__playlist">
+                <div class="modal-player__playlist-content custom-scroll"></div>
+
+                <div class="modal-player__playlist-footer">
+
+                    <div class="modal-player__playlist-footer-next">
+                        <div class="modal-player__playlist-footer-next-button"></div>
+                        <div class="modal-player__playlist-footer-next-text">Season 1 Series 2</div>
+                    </div>
+
+                    <!-- <div class="modal-player__playlist-footer-select">
+                <select class="select" data-season-select><option value="0">Season 1</option><option value="1">Season 2</option><option value="2">Season 3</option><option value="3">Season 4</option></select>            
+            </div> -->
+                </div>
+
+            </div>
+
+        </div>
+        <!--fine playlist-->
+  </div>
+
+  <script>
+    const video = document.getElementById("main-video");
+    const thumbnail = document.querySelector(".thumbnail");
+    const progressBar = document.getElementById("progressBar");
+    const muteBtn = document.getElementById("muteBtn");
+    const titleImage = document.getElementById("title-image");
+    const description = document.getElementById("description");
+    const sfumateOverlay = document.getElementById("sfumate-overlay");
+    const videoToggle = document.getElementById('videoToggle');
+
+    const videos = [
+      {
+        poster: "assets/antman.jpg",
+        mp4: "assets/antman.mp4",
+        titleImg: "assets/antman.png",
+        description: "Un ex ingegnere elettronico e ladro che entra in possesso di una tecnologia che gli permette di ridere delle sue dimensioni."
+      }
+    ];
+
+    let currentIndex = 0;
+    let posterTimeout = null;
+    let isVideoPlaying = false;
+
+    const svgIcons = {
+      mute: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>`,
+      volumeUp: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M14 3.23v2.06c2.89 1.15 5 4.09 5 7.71s-2.11 6.56-5 7.71v2.06c4.01-1.15 7-4.95 7-9.77s-2.99-8.62-7-9.77zM3 9v6h4l5 5V4L7 9H3z"/></svg>`,
+      replay: `<svg width="40" height="40" viewBox="0 0 76 76" fill="white"><path d="M 18,33.5001L 18,27L 27,19L 36,27.5001L 36,33.5001L 30,28.2097L 30,40.5C 30,46.299 34.701,51 40.5,51C 46.299,51 51,46.299 51,40.5C 31.3873,57 24,49.6127 24,40.5L 24,28.125L 18,33.5001 Z "/></svg>`
+    };
+
+    function loadVideo(index) {
+      currentIndex = index;
+      clearTimeout(posterTimeout);
+
+      video.pause();
+      video.muted = true;
+      thumbnail.style.display = "block";
+      description.classList.remove("show");
+      sfumateOverlay.classList.remove("show");
+
+      const v = videos[currentIndex];
+      thumbnail.src = v.poster;
+      titleImage.src = v.titleImg;
+      description.textContent = v.description;
+      video.src = v.mp4;
+
+      if (videoToggle.checked) {
+        posterTimeout = setTimeout(() => {
+          thumbnail.style.display = "none";
+          playVideo();
+        }, 3500);
+      }
     }
-  ];
 
-  let currentIndex = 0;
-  let posterTimeout = null;
-  let isVideoPlaying = false;
-
-  const svgIcons = {
-    mute: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>`,
-    volumeUp: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M14 3.23v2.06c2.89 1.15 5 4.09 5 7.71s-2.11 6.56-5 7.71v2.06c4.01-1.15 7-4.95 7-9.77s-2.99-8.62-7-9.77zM3 9v6h4l5 5V4L7 9H3z"/></svg>`,
-    replay: `<svg width="40" height="40" viewBox="0 0 76 76" fill="white"><path d="M 18,33.5001L 18,27L 27,19L 36,27.5001L 36,33.5001L 30,28.2097L 30,40.5C 30,46.299 34.701,51 40.5,51C 46.299,51 51,46.299 51,40.5C 31.3873,57 24,49.6127 24,40.5L 24,28.125L 18,33.5001 Z "/></svg>`
-  };
-
-  function loadVideo(index) {
-    currentIndex = index;
-    clearTimeout(posterTimeout);
-    
-    video.pause();
-    video.muted = true;
-    thumbnail.style.display = "block";
-    description.classList.remove("show");
-    sfumateOverlay.classList.remove("show");
-    
-    const v = videos[currentIndex];
-    thumbnail.src = v.poster;
-    titleImage.src = v.titleImg;
-    description.textContent = v.description;
-    video.src = v.mp4;
-
-    if (videoToggle.checked) {
-      posterTimeout = setTimeout(() => {
-        thumbnail.style.display = "none";
-        playVideo();
-      }, 3500);
+    function playVideo() {
+      isVideoPlaying = true;
+      video.play().catch(() => {
+        thumbnail.style.display = "block";
+        muteBtn.innerHTML = svgIcons.replay;
+      });
     }
-  }
 
-  function playVideo() {
-    isVideoPlaying = true;
-    video.play().catch(() => {
+    video.addEventListener("timeupdate", () => {
+      const percent = (video.currentTime / video.duration) * 100;
+      progressBar.style.width = percent + "%";
+    });
+
+    video.addEventListener("ended", () => {
+      isVideoPlaying = false;
       thumbnail.style.display = "block";
       muteBtn.innerHTML = svgIcons.replay;
+      description.classList.add("show");
+      sfumateOverlay.classList.add("show");
     });
-  }
 
-  video.addEventListener("timeupdate", () => {
-    const percent = (video.currentTime / video.duration) * 100;
-    progressBar.style.width = percent + "%";
-  });
+    muteBtn.addEventListener("click", () => {
+      if (isVideoPlaying) {
+        video.muted = !video.muted;
+        muteBtn.innerHTML = video.muted ? svgIcons.mute : svgIcons.volumeUp;
+      } else {
+        loadVideo(currentIndex);
+      }
+    });
 
-  video.addEventListener("ended", () => {
-    isVideoPlaying = false;
-    thumbnail.style.display = "block";
-    muteBtn.innerHTML = svgIcons.replay;
-    description.classList.add("show");
-    sfumateOverlay.classList.add("show");
-  });
-
-  muteBtn.addEventListener("click", () => {
-    if (isVideoPlaying) {
-      video.muted = !video.muted;
-      muteBtn.innerHTML = video.muted ? svgIcons.mute : svgIcons.volumeUp;
-    } else {
-      loadVideo(currentIndex);
+    function toggleVideoVisibility() {
+      if (!videoToggle.checked) {
+        video.pause();
+        clearTimeout(posterTimeout);
+        thumbnail.style.display = "block";
+      } else {
+        loadVideo(currentIndex);
+      }
     }
-  });
 
-  function toggleVideoVisibility() {
-    if (!videoToggle.checked) {
-      video.pause();
-      clearTimeout(posterTimeout);
-      thumbnail.style.display = "block";
-    } else {
-      loadVideo(currentIndex);
-    }
-  }
-
-  // Avvio automatico al caricamento
-  window.addEventListener('load', () => loadVideo(0));
-</script>
-<script>
+    // Avvio automatico al caricamento
+    window.addEventListener('load', () => loadVideo(0));
+  </script>
+  <!-- categories data -->
+  <script>
     const categoriesData = [
-        { name: "1. Animazione", tags: ["anime"], subs: ["Anime", "CGI 3D", "Stop Motion", "Disney", "Adult Swim", "Comics", "Cartoon", "Musicale"], desc: "Infanzia, crescita, mondi immaginari. Colorata, giocosa, surreale." },
-        { name: "2. Drammatico", tags: ["drama"], subs: ["Romantico", "Tragedia", "Sociale", "Biografico", "Storico", "Giudiziario", "Psicologico", "Medicina"], desc: "Conflitti umani, ingiustizia, amore. Intensa, malinconica, seria." },
-        { name: "3. Azione", tags: ["action"], subs: ["Arti Marziali", "Spy Story", "Supereroi", "Guerra", "Heist Film", "Inseguimenti", "Catastrofico", "Hard"], desc: "Giustizia, vendetta, sopravvivenza. Adrenalinica, frenetica, tesa." },
-        { name: "4. Thriller", tags: ["thriller"], subs: ["Psicologico", "Crime (Narcos)", "Mystery", "Politico", "Cospirazione", "Noir", "Poliziesco", "Droga"], desc: "Inganno, paranoia, verità nascoste. Inquietante, sospesa, cinica." },
-        { name: "5. Horror", tags: ["horror"], subs: ["Slasher", "Paranormale", "Gore", "Zombie", "Folk Horror", "Inquietante", "Splatter"], desc: "Morte, ignoto, male primordiale. Terrificante, macabra, oscura." },
-        { name: "6. Fantascienza", tags: ["sci-fi"], subs: ["Cyberpunk", "Space Opera", "Distopico", "Viaggi nel tempo", "Sci-Fi classico", "Tecnologia"], desc: "Futuro, AI, alieni, etica. Futuristica, fredda, tecnologica." },
-        { name: "7. Documentario", tags: ["doc"], subs: ["Natura", "Storia", "Scienza", "True Crime", "Cucina", "Politico/Sociale", "Narcos", "Droga"], desc: "Conoscenza, verità, cronaca reale. Istruttiva, realistica, cruda." },
-        { name: "8. Fantasy", tags: ["fantasy"], subs: ["Epic Fantasy", "Magia", "Mitologia", "Dark Fantasy", "Mondi Alternativi"], desc: "Destino, profezie, poteri. Magica, epica, incantata." },
-        { name: "9. Commedia", tags: ["comedy"], subs: ["Satira", "Demenziale", "Romantica", "Sketch", "Grottesco", "Parodistico"], desc: "Equivoci, satira, assurdità. Divertente, leggera, ironica." },
-        { name: "10. Avventura", tags: ["adventure"], subs: ["Esplorazione", "Survival", "Ricerca Tesori", "Viaggio"], desc: "Scoperta, libertà, sfida. Avvincente, solare, eroica." },
-        { name: "11. Western", tags: ["western"], subs: ["Classico", "Spaghetti Western", "Modern", "Frontiera"], desc: "Legge, frontiera, onore. Polverosa, aspra, silenziosa." },
-        { name: "12. Guerra", tags: ["war"], subs: ["Prima Guerra", "Seconda Guerra", "Vietnam", "Cold War", "Militare", "Tattica"], desc: "Fratellanza, sacrificio, strategia. Drammatica, caotica, cruda." },
-        { name: "13. Storico", tags: ["history"], subs: ["Antichità", "Medioevo", "Rinascimento", "Era Moderna"], desc: "Eredità, potere, eventi epocali. Solenne, grandiosa, autentica." },
-        { name: "14. Biografico", tags: ["bio"], subs: ["Artisti", "Leader", "Scienziati", "Sportivi"], desc: "Vita reale, ascesa, successo. Ispiratrice, autentica." },
-        { name: "15. Giallo", tags: ["mystery"], subs: ["Detective", "Noir", "Poliziesco Enigmatico"], desc: "Indagine, risoluzione enigmi. Misteriosa, analitica." },
-        { name: "16. Sport", tags: ["sport"], subs: ["Documentari", "Grandi Sfide", "Biopic Sportivi"], desc: "Resilienza, competizione. Dinamica, avvincente." },
-        { name: "17. Musical", tags: ["musical"], subs: ["Broadway", "Opera Rock", "Musical Classico"], desc: "Arte, espressione, danza. Spettacolare, visivamente ricca." }
+      { name: "1. Animazione", tags: ["anime"], subs: ["Anime", "CGI 3D", "Stop Motion", "Disney", "Adult Swim", "Comics", "Cartoon", "Musicale"], desc: "Infanzia, crescita, mondi immaginari. Colorata, giocosa, surreale." },
+      { name: "2. Drammatico", tags: ["drama"], subs: ["Romantico", "Tragedia", "Sociale", "Biografico", "Storico", "Giudiziario", "Psicologico", "Medicina"], desc: "Conflitti umani, ingiustizia, amore. Intensa, malinconica, seria." },
+      { name: "3. Azione", tags: ["action"], subs: ["Arti Marziali", "Spy Story", "Supereroi", "Guerra", "Heist Film", "Inseguimenti", "Catastrofico", "Hard"], desc: "Giustizia, vendetta, sopravvivenza. Adrenalinica, frenetica, tesa." },
+      { name: "4. Thriller", tags: ["thriller"], subs: ["Psicologico", "Crime (Narcos)", "Mystery", "Politico", "Cospirazione", "Noir", "Poliziesco", "Droga"], desc: "Inganno, paranoia, verità nascoste. Inquietante, sospesa, cinica." },
+      { name: "5. Horror", tags: ["horror"], subs: ["Slasher", "Paranormale", "Gore", "Zombie", "Folk Horror", "Inquietante", "Splatter"], desc: "Morte, ignoto, male primordiale. Terrificante, macabra, oscura." },
+      { name: "6. Fantascienza", tags: ["sci-fi"], subs: ["Cyberpunk", "Space Opera", "Distopico", "Viaggi nel tempo", "Sci-Fi classico", "Tecnologia"], desc: "Futuro, AI, alieni, etica. Futuristica, fredda, tecnologica." },
+      { name: "7. Documentario", tags: ["doc"], subs: ["Natura", "Storia", "Scienza", "True Crime", "Cucina", "Politico/Sociale", "Narcos", "Droga"], desc: "Conoscenza, verità, cronaca reale. Istruttiva, realistica, cruda." },
+      { name: "8. Fantasy", tags: ["fantasy"], subs: ["Epic Fantasy", "Magia", "Mitologia", "Dark Fantasy", "Mondi Alternativi"], desc: "Destino, profezie, poteri. Magica, epica, incantata." },
+      { name: "9. Commedia", tags: ["comedy"], subs: ["Satira", "Demenziale", "Romantica", "Sketch", "Grottesco", "Parodistico"], desc: "Equivoci, satira, assurdità. Divertente, leggera, ironica." },
+      { name: "10. Avventura", tags: ["adventure"], subs: ["Esplorazione", "Survival", "Ricerca Tesori", "Viaggio"], desc: "Scoperta, libertà, sfida. Avvincente, solare, eroica." },
+      { name: "11. Western", tags: ["western"], subs: ["Classico", "Spaghetti Western", "Modern", "Frontiera"], desc: "Legge, frontiera, onore. Polverosa, aspra, silenziosa." },
+      { name: "12. Guerra", tags: ["war"], subs: ["Prima Guerra", "Seconda Guerra", "Vietnam", "Cold War", "Militare", "Tattica"], desc: "Fratellanza, sacrificio, strategia. Drammatica, caotica, cruda." },
+      { name: "13. Storico", tags: ["history"], subs: ["Antichità", "Medioevo", "Rinascimento", "Era Moderna"], desc: "Eredità, potere, eventi epocali. Solenne, grandiosa, autentica." },
+      { name: "14. Biografico", tags: ["bio"], subs: ["Artisti", "Leader", "Scienziati", "Sportivi"], desc: "Vita reale, ascesa, successo. Ispiratrice, autentica." },
+      { name: "15. Giallo", tags: ["mystery"], subs: ["Detective", "Noir", "Poliziesco Enigmatico"], desc: "Indagine, risoluzione enigmi. Misteriosa, analitica." },
+      { name: "16. Sport", tags: ["sport"], subs: ["Documentari", "Grandi Sfide", "Biopic Sportivi"], desc: "Resilienza, competizione. Dinamica, avvincente." },
+      { name: "17. Musical", tags: ["musical"], subs: ["Broadway", "Opera Rock", "Musical Classico"], desc: "Arte, espressione, danza. Spettacolare, visivamente ricca." }
     ];
 
     let currentIdx = -1;
@@ -528,10 +1026,10 @@
     const input = document.getElementById('searchInput');
 
     function render(idx) {
-        if (idx < 0 || idx >= categoriesData.length) return;
-        currentIdx = idx;
-        const cat = categoriesData[idx];
-        container.innerHTML = `
+      if (idx < 0 || idx >= categoriesData.length) return;
+      currentIdx = idx;
+      const cat = categoriesData[idx];
+      container.innerHTML = `
             <div class="category-container">
                 <div class="category-main">
                     <div class="category-title">${cat.name}</div>
@@ -548,10 +1046,99 @@
 
     window.change = (step) => render(currentIdx + step);
     input.oninput = (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        const i = categoriesData.findIndex(c => c.name.toLowerCase().includes(q) || c.tags.some(t => t.includes(q)));
-        if(i !== -1) render(i);
+      const q = e.target.value.toLowerCase().trim();
+      const i = categoriesData.findIndex(c => c.name.toLowerCase().includes(q) || c.tags.some(t => t.includes(q)));
+      if (i !== -1) render(i);
     };
-</script>
+  </script>
+  <!-- playlist data source -->
+  <script>
+    //render playlist on Landing
+    let html_playlist_landing = "";
+    let html_playlist_select = "";
+    let html_modal_playlist = "";
+    const playlist_landing = playlist_data_source.map((season, key) => {
+      html_playlist_landing += render_playlist_items_template(season, key)
+      html_modal_playlist += render_modal_playlist_items_template(season, key)
+      html_playlist_select += render_playlist_select(season, key)
+    })
+
+    document.querySelector('.playlist__items').innerHTML = html_playlist_landing;
+    document.querySelector('.modal-player__playlist-content').innerHTML = html_modal_playlist;
+    document.querySelector('.playlist__dropdown select').innerHTML = html_playlist_select;
+    document.querySelector('.modal-player__season-select select').innerHTML = html_playlist_select;
+
+    function render_playlist_select(playlist_data, key) {
+      const { season_id, season_name, season_videos } = playlist_data;
+      const select_option = `<option value="${season_id}">Season ${key + 1}</option>`;
+      return select_option;
+    }
+
+    function render_playlist_items_template(playlist_data, key) {
+      const { season_id, season_name, season_videos } = playlist_data;
+      const playlist_series_list = season_videos.map((series, index) => render_series_template(index, { season_id, ...series }))
+      const active_class = key === 0 ? 'playlist__item--active' : '';
+      const playlist_items_template = `<div class="playlist__item ${active_class}" data-season-index="${key}">${playlist_series_list.join("")}</div>`;
+      return playlist_items_template;
+    }
+    function render_series_template(index, series_data) {
+      const { season_id, video_id, video_name, video_description, video_duration, video_poster, video_url } = series_data;
+      const series_template = `<div class="playlist__series">
+            <div class="playlist__series-number">${index + 1}</div>
+            <div class="playlist__series-preview thumbnail" data-season-index="${season_id}"
+                    data-series-index="${video_id}">
+                <div class="playlist__series-preview-item">
+
+                    <video class="playlist__series-preview-item-video thumbnail__video" muted
+                            playsinline>
+                        <source src="${video_url}">
+                        <track kind="chapters" src="chapters.vtt" default>
+                    </video>
+
+                    <img class="playlist__series-preview-item-img thumbnail__img"
+                            src="${video_poster}">
+                            <span class="playlist__series-preview-item-time thumbnail__time">--:--</span>
+                    <progress id='top-progress-bar' class='top-progress-bar' min='0' max='100' value='0'>0%
+                                    played</progress>
+                </div>
+            </div>
+            <div class="playlist__series-title">${video_name}</div>
+            <div class="playlist__series-description">${video_description}</div>
+        </div>`;
+      return series_template;
+    }
+
+    //render modal playlist template
+    function render_modal_playlist_items_template(playlist_data, key) {
+      const { season_id, season_name, season_videos } = playlist_data;
+      const modal_playlist_series_list = season_videos.map((series, index) => render_modal_series_template(index, { season_id, ...series }))
+      const active_class = key === 0 ? 'modal-player__playlist-item--active' : '';
+      const playlist_items_template = `<div class="modal-player__playlist-item ${active_class}" data-season-index="${season_id}">${modal_playlist_series_list.join("")}</div>`;
+      return playlist_items_template;
+    }
+    function render_modal_series_template(index, series_data) {
+      const { season_id, video_id, video_name, video_description, video_duration, video_poster, video_url } = series_data;
+      const series_template = `<div class="modal-player__series" data-season-index="${season_id}" data-series-index="${video_id}" data-series-number="${index + 1}">
+                <div class="modal-player__series-preview thumbnail" data-season-index="${season_id}" data-series-index="${video_id}">
+                    <div class="modal-player__series-preview-item">
+
+                        <video class="modal-player__series-preview-item-video thumbnail__video" muted
+                                playsinline>
+                            <source src="${video_url}">
+                            <track kind="chapters" src="chapters.vtt" default>
+                        </video>
+                        <span class="modal-player__series-time thumbnail__time">--:--</span>
+                        <progress id='top-progress-bar' class='top-progress-bar' min='0' max='100' value='0'>0% played</progress>
+                        <img class="modal-player__series-item-img thumbnail__img"
+                                src="${video_poster}">
+                    </div>
+                </div>
+                <div class="modal-player__series-title">${video_name}</div>
+                <div class="modal-player__series-description">${video_description}</div>
+            </div>`;
+      return series_template;
+    }
+  </script>
 </body>
+
 </html>
